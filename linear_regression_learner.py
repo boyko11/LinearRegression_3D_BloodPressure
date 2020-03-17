@@ -41,6 +41,7 @@ class LinearRegressionLearner:
 
         print('min_cost_index: ', min_cost_index)
         print('min_cost_theta: ', self.theta)
+
         self.cost_history = self.cost_history[:min_cost_index + 1]
 
     def update_theta_gradient_descent(self, predictions, data):

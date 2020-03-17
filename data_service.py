@@ -29,6 +29,4 @@ class DataService:
         labels_min = np.amin(actual_labels)
         labels_max = np.amax(actual_labels)
 
-        print(labels_min, labels_max)
-
         return predictions * (labels_max - labels_min) + labels_min
