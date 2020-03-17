@@ -11,7 +11,13 @@ class Runner:
     def run():
         # Load Data
         data = DataService.load_csv("data/blood_pressure_cengage.csv")
-        PlotService.plot3d_scatter(data, labels=['Age', 'Weight', 'BP'], title="Blood Pressure for Age and Weight.")
+
+        # PlotService.plot3d_scatter(data, labels=['Age', 'Weight', 'BP'], title="Blood Pressure for Age and Weight.")
+
+        normalized_data = DataService.min_max_normalize(data)
+
+        PlotService.plot3d_scatter(normalized_data, labels=['Age', 'Weight', 'BP'],
+                                   title="BP for Age and Weight. Min-Max normalized.")
 
 
 if __name__ == "__main__":
