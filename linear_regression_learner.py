@@ -12,13 +12,13 @@ class LinearRegressionLearner:
         # since data contains all features plus the label,
         # it just happens the number of columns is the same as the number of thetas
 
-    def predict_single_record(self, record_feature_data):
-
-        return np.dot(self.theta, np.concatenate(([1], record_feature_data)))
-
-    def predict_all_records(self, feature_data):
+    def predict(self, feature_data):
 
         return np.dot(np.insert(feature_data, 0, 1, axis=1), np.transpose(self.theta)).flatten()
+
+    def predict_for_theta(self, feature_data, theta):
+
+        return np.dot(np.insert(feature_data, 0, 1, axis=1), np.transpose(theta)).flatten()
 
     @staticmethod
     def calculate_cost(predictions, labels):
@@ -30,7 +30,7 @@ class LinearRegressionLearner:
         feature_data = data[:, :-1]
         labels = data[:, -1]
         for i in range(15000):
-            predictions = self.predict_all_records(feature_data)
+            predictions = self.predict(feature_data)
             current_cost = self.calculate_cost(predictions, labels)
             self.cost_history.append(current_cost)
             self.theta_history.append(self.theta)

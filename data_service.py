@@ -30,3 +30,15 @@ class DataService:
         labels_max = np.amax(actual_labels)
 
         return predictions * (labels_max - labels_min) + labels_min
+
+    @staticmethod
+    def min_max_normalize_single(number_to_normalize, data_min, data_max):
+
+        return (number_to_normalize - data_min) / (data_max - data_min)
+
+    @staticmethod
+    def min_max_denormalize_single(number_to_denormalize, data_min, data_max):
+
+        return number_to_denormalize * (data_max - data_min) + data_min
+
+
