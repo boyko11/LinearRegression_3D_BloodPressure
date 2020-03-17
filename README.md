@@ -14,3 +14,11 @@ Puts feature data and labels within [0, 1] range
 ## Training Learning Curve
 
 ![Training Learning Curve](plots/training_learning_curve.png)
+
+## Trained Model
+
+![Trained Model](plots/trained_model.png)
+
+## Actual vs Projected
+
+![Actual vs Projected](plots/actual_vs_projected.png)

@@ -29,7 +29,8 @@ class Runner:
         cost = self.linear_regression_learner.calculate_cost(predictions, labels)
 
         print("Labels: ", data[:, -1])
-        print("Predictions", np.around(DataService.min_max_denormalize_predictions(data[:, -1], predictions)))
+        predictions = np.around(DataService.min_max_denormalize_predictions(data[:, -1], predictions))
+        print("Predictions", )
         print('Cost: ', cost)
 
         PlotService.plot_line(
@@ -39,6 +40,23 @@ class Runner:
             y_label="Training Cost",
             title="Training Learning Curve")
 
+        #best documented theta: -0.03028008  0.52666306  0.51706439
+
+        age = data[:, 0].flatten()
+        weight = data[:, 1].flatten()
+        min_predict_index = np.argmin(predictions)
+        max_predict_index = np.argmax(predictions)
+        x = [age[min_predict_index], age[max_predict_index]]
+        y = [weight[min_predict_index], weight[max_predict_index]]
+        z = [predictions[min_predict_index], predictions[max_predict_index]]
+
+        PlotService.plot3d_line(x, y, z, labels=['Age', 'Weight', 'BP'],
+                                title="Linear Model: Blood Pressure for Age and Weight." )
+
+        projected = data.copy()
+        projected[:, -1] = predictions
+        PlotService.plot3d_scatter_compare(data, projected, labels=['Age', 'Weight', 'BP'],
+                                title="Actual vs Projected")
 
 
 if __name__ == "__main__":
