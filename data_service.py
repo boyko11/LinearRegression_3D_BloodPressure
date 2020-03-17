@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class DataService:
 
     def __init__(self):
@@ -20,3 +21,14 @@ class DataService:
         x_maxs = np.repeat(x_maxs, data.shape[0], axis=0)
 
         return (data - x_mins) / (x_maxs - x_mins)
+
+    @staticmethod
+    def min_max_denormalize_predictions(actual_labels, predictions):
+
+        np.set_printoptions(suppress=True)
+        labels_min = np.amin(actual_labels)
+        labels_max = np.amax(actual_labels)
+
+        print(labels_min, labels_max)
+
+        return predictions * (labels_max - labels_min) + labels_min
