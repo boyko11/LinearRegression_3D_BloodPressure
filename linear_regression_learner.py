@@ -16,7 +16,8 @@ class LinearRegressionLearner:
 
         return np.dot(np.insert(feature_data, 0, 1, axis=1), np.transpose(self.theta)).flatten()
 
-    def predict_for_theta(self, feature_data, theta):
+    @staticmethod
+    def predict_for_theta(feature_data, theta):
 
         return np.dot(np.insert(feature_data, 0, 1, axis=1), np.transpose(theta)).flatten()
 

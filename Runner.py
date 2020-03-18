@@ -6,8 +6,9 @@ import numpy as np
 
 class Runner:
 
-    def __init__(self):
+    def __init__(self, normalization_method='min-max'):
         self.linear_regression_learner = None
+        self.normalization_method = normalization_method
 
     def run(self):
         # Load Data
@@ -16,7 +17,7 @@ class Runner:
 
         # PlotService.plot3d_scatter(data, labels=['Age', 'Weight', 'BP'], title="Blood Pressure for Age and Weight.")
 
-        normalized_data = DataService.min_max_normalize(data)
+        normalized_data = DataService.normalize(data, method='min-max')
 
         # PlotService.plot3d_scatter(normalized_data, labels=['Age', 'Weight', 'BP'],
         #                            title="BP for Age and Weight. Min-Max normalized.")
@@ -25,7 +26,8 @@ class Runner:
 
         feature_data = normalized_data[:, :-1]
         normalized_predictions = self.linear_regression_learner.predict(feature_data)
-        predictions = np.around(DataService.min_max_denormalize_predictions(data[:, -1], normalized_predictions))
+        predictions = np.around(DataService.denormalize_predictions(data[:, -1], normalized_predictions,
+                                                                    method='min-max'))
 
         PlotService.plot_line(
             x=range(1, len(self.linear_regression_learner.cost_history) + 1),
@@ -75,6 +77,16 @@ class Runner:
         min_blood_pressure = x_mins[2]
         max_blood_pressure = x_maxs[2]
 
+        x_means = np.mean(data, axis=0)
+        mean_age = x_means[0]
+        mean_weight = x_means[1]
+        mean_blood_pressure = x_means[2]
+
+        x_stds = np.std(data, axis=0)
+        std_age = x_stds[0]
+        std_weight = x_stds[1]
+        std_blood_pressure = x_stds[2]
+
         while True:
 
             age = input("Enter Age or type quit to exit: ")
@@ -91,26 +103,33 @@ class Runner:
                 print("Age and Weight should be integers.", age, weight)
                 break
 
-            test_age = DataService.min_max_normalize_single(age, min_age, max_age)
-            test_weight = DataService.min_max_normalize_single(weight, min_weight, max_weight)
+            test_age = DataService.normalize_single(age, min=min_age, max=max_age, mean=mean_age, std=std_age,
+                                                    method=self.normalization_method)
+            test_weight = DataService.normalize_single(weight, min=min_weight, max=max_weight, mean=mean_weight,
+                                                       std=std_weight, method=self.normalization_method)
 
             current_theta_normalized_projection = \
                 self.linear_regression_learner.predict(np.array([test_age, test_weight]).reshape(1, 2))
 
             print("Current Theta Projection: ",
-                  DataService.min_max_denormalize_single(current_theta_normalized_projection, min_blood_pressure,
-                                                         max_blood_pressure))
-            # best documented theta: -0.04973713  0.7198039   0.33875262
-            best_theta = np.array([-0.04973713,  0.7198039,   0.33875262]).reshape((1, 3))
+                  DataService.denormalize_single(current_theta_normalized_projection, method=self.normalization_method,
+                                                 min=min_blood_pressure, max=max_blood_pressure,
+                                                 mean=mean_blood_pressure, std=std_blood_pressure))
+            # best documented theta min-max norm: -0.04973713  0.7198039   0.33875262
+            # best documented theta zscore norm: -0.03447741  0.70838301  0.32258052
+            best_theta = np.array([-0.03447741, 0.70838301, 0.32258052]).reshape((1, 3))
+            if self.normalization_method == 'min-max':
+                best_theta = np.array([-0.04973713,  0.7198039,   0.33875262]).reshape((1, 3))
+
             best_theta_normalized_projection = self.linear_regression_learner\
                 .predict_for_theta(np.array([test_age, test_weight]).reshape(1, 2), best_theta)
 
             print("Best Theta Projection: ",
-                  DataService.min_max_denormalize_single(best_theta_normalized_projection, min_blood_pressure,
-                                                         max_blood_pressure))
-
+                  DataService.denormalize_single(best_theta_normalized_projection, method=self.normalization_method,
+                                                 min=min_blood_pressure, max=max_blood_pressure,
+                                                 mean=mean_blood_pressure, std=std_blood_pressure))
 
 
 if __name__ == "__main__":
 
-    Runner().run()
+    Runner(normalization_method='z').run()

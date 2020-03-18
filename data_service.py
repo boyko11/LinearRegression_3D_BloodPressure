@@ -11,6 +11,14 @@ class DataService:
         return np.loadtxt(open(file_name, "rb"), delimiter=",")
 
     @staticmethod
+    def normalize(data, method='min-max'):
+
+        if method == 'min-max':
+            return DataService.min_max_normalize(data)
+
+        return DataService.zscore_normalize(data)
+
+    @staticmethod
     def min_max_normalize(data):
 
         np.set_printoptions(suppress=True)
@@ -23,6 +31,23 @@ class DataService:
         return (data - x_mins) / (x_maxs - x_mins)
 
     @staticmethod
+    def zscore_normalize(data):
+
+        means = np.mean(data, axis=0).reshape(1, data.shape[1])
+        means = np.repeat(means, data.shape[0], axis=0)
+        stds = np.std(data, axis=0).reshape(1, data.shape[1])
+        stds = np.repeat(stds, data.shape[0], axis=0)
+        return (data - means) / stds
+
+    @staticmethod
+    def denormalize_predictions(actual_labels, predictions, method='min-max'):
+
+        if method == 'min-max':
+            return DataService.min_max_denormalize_predictions(actual_labels, predictions)
+
+        return DataService.zscore_denormalize_predictions(actual_labels, predictions)
+
+    @staticmethod
     def min_max_denormalize_predictions(actual_labels, predictions):
 
         np.set_printoptions(suppress=True)
@@ -32,13 +57,30 @@ class DataService:
         return predictions * (labels_max - labels_min) + labels_min
 
     @staticmethod
-    def min_max_normalize_single(number_to_normalize, data_min, data_max):
+    def zscore_denormalize_predictions(actual_labels, predictions):
 
-        return (number_to_normalize - data_min) / (data_max - data_min)
+        np.set_printoptions(suppress=True)
+        labels_mean = np.mean(actual_labels)
+        labels_std = np.std(actual_labels)
+
+        return predictions * labels_std + labels_mean
 
     @staticmethod
-    def min_max_denormalize_single(number_to_denormalize, data_min, data_max):
+    def normalize_single(number_to_normalize, method='min-max', min=None, max=None, mean=None, std=None):
 
-        return number_to_denormalize * (data_max - data_min) + data_min
+        if method == 'min-max':
+            return (number_to_normalize - min) / (max - min)
+
+        return (number_to_normalize - mean) / std
+
+    @staticmethod
+    def denormalize_single(number_to_denormalize, method='min-max', min=None, max=None, mean=None, std=None):
+
+        if method == 'min-max':
+            return number_to_denormalize * (max - min) + min
+
+        # z-score denormalization
+        return number_to_denormalize * std + mean
+
 
 
