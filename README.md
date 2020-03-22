@@ -22,14 +22,14 @@ Puts feature data and labels within [0, 1] range
 
 ![Trained Model](plots/trained_model.png)
 
-## Actual vs Projected
-
-![Actual vs Projected](plots/actual_vs_projected.png)
-
 ## Normal Equation Trained Model
 
 ![Normal Equation Trained Model](plots/norm_equation_model.png)
 
 ## Actual vs Projected
+
+![Actual vs Projected](plots/actual_vs_projected.png)
+
+## Normal Equation Actual vs Projected
 
 ![Normal Equation Actual vs Projected](plots/norm_equation_actual_vs_projected.png)
