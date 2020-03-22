@@ -49,7 +49,33 @@ class Runner:
         cost = self.linear_regression_learner.calculate_cost(normalized_predictions, labels)
         print("Final Normalized Cost: ", cost)
 
-        self.test(data)
+        # self.test(data)
+
+        print("Normal Equation: ")
+
+        # Normal equation
+        feature_data_bias = np.insert(feature_data, 0, 1, axis=1)
+        x_trans_x = np.dot(np.transpose(feature_data_bias), feature_data_bias)
+        norm_equation_theta = np.dot(np.dot(np.linalg.inv(x_trans_x), np.transpose(feature_data_bias)), labels)
+        print(norm_equation_theta)
+
+        self.linear_regression_learner.theta = norm_equation_theta
+
+        normalized_predictions = self.linear_regression_learner.predict(feature_data)
+        predictions = np.around(DataService.denormalize_predictions(data[:, -1], normalized_predictions,
+                                                                    method='min-max'))
+        cost = self.linear_regression_learner.calculate_cost(normalized_predictions, labels)
+        print("Final Norm Equation Normalized Cost: ", cost)
+
+        x, y, z = self.build_model_plot_data(data, predictions)
+        PlotService.plot3d_line(x, y, z, labels=['Age', 'Weight', 'BP'],
+                                title="Normal Equation Model: Blood Pressure for Age and Weight." )
+
+        projected_data = data.copy()
+        projected_data[:, -1] = predictions
+        PlotService.plot3d_scatter_compare(data, projected_data, labels=['Age', 'Weight', 'BP'],
+                                title="Normal Equation Actual vs Projected")
+
 
     @staticmethod
     def build_model_plot_data(data, predictions):

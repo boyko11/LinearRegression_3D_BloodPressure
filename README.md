@@ -2,6 +2,9 @@ Linear Regresssion for the simple cengage systolic blood pressure dataset:
 
 https://college.cengage.com/mathematics/brase/understandable_statistics/7e/students/datasets/mlr/frames/frame.html
 
+#### Run verified with python 3.7 and numpy 1.18.1
+python Runner.py
+
 ## Visualize
 ![Blood Pressure for Age And Weight](plots/visualize.png)
 
@@ -22,3 +25,11 @@ Puts feature data and labels within [0, 1] range
 ## Actual vs Projected
 
 ![Actual vs Projected](plots/actual_vs_projected.png)
+
+## Normal Equation Trained Model
+
+![Normal Equation Trained Model](plots/norm_equation_model.png)
+
+## Actual vs Projected
+
+![Normal Equation Actual vs Projected](plots/norm_equation_actual_vs_projected.png)
