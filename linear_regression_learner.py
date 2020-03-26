@@ -26,16 +26,14 @@ class LinearRegressionLearner:
 
         return np.sum(np.square(labels - predictions)) / 2 * predictions.shape[0]
 
-    def train(self, data):
+    def train(self, feature_data, labels):
 
-        feature_data = data[:, :-1]
-        labels = data[:, -1]
         for i in range(15000):
             predictions = self.predict(feature_data)
             current_cost = self.calculate_cost(predictions, labels)
             self.cost_history.append(current_cost)
             self.theta_history.append(self.theta)
-            self.update_theta_gradient_descent(predictions, data)
+            self.update_theta_gradient_descent(predictions, feature_data, labels)
 
         min_cost_index = np.argmin(self.cost_history)
         self.theta = self.theta_history[min_cost_index]
@@ -45,10 +43,7 @@ class LinearRegressionLearner:
 
         self.cost_history = self.cost_history[:min_cost_index + 1]
 
-    def update_theta_gradient_descent(self, predictions, data):
-
-        feature_data = data[:, :-1]
-        labels = data[:, -1]
+    def update_theta_gradient_descent(self, predictions, feature_data, labels):
 
         predictions_minus_labels = np.transpose(predictions - labels)
 

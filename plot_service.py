@@ -25,12 +25,12 @@ class PlotService:
         plt.show()
 
     @staticmethod
-    def plot3d_scatter_compare(data1, data2, labels, marker1='o', marker2='x', color1=None, color2=None, title=''):
+    def plot3d_scatter_compare(feature_data, labels_data, predictions, labels=['', '', ''], marker1='o', marker2='x', color1=None, color2=None, title=''):
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(data1[:, 0], data1[:, 1], data1[:, 2], marker=marker1, label="Actual")
-        ax.scatter(data2[:, 0], data2[:, 1], data2[:, 2], marker=marker2, label="Projected")
+        ax.scatter(feature_data[:, 0], feature_data[:, 1], labels_data, marker=marker1, label="Actual")
+        ax.scatter(feature_data[:, 0], feature_data[:, 1], predictions, marker=marker2, label="Projected")
 
         ax.set_xlabel(labels[0])
         ax.set_ylabel(labels[1])

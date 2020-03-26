@@ -11,22 +11,35 @@ class Runner:
         self.normalization_method = normalization_method
 
     def run(self):
-        # Load Data
+
         data = DataService.load_csv("data/blood_pressure_cengage.csv")
+        feature_data = data[:, :-1]
+        labels = data[:, -1]
         self.linear_regression_learner = LinearRegressionLearner(data, learning_rate=0.001)
 
         # PlotService.plot3d_scatter(data, labels=['Age', 'Weight', 'BP'], title="Blood Pressure for Age and Weight.")
 
         normalized_data = DataService.normalize(data, method='min-max')
+        normalized_feature_data = normalized_data[:, :-1]
+        normalized_labels = normalized_data[:, -1]
 
         # PlotService.plot3d_scatter(normalized_data, labels=['Age', 'Weight', 'BP'],
         #                            title="BP for Age and Weight. Min-Max normalized.")
 
-        self.linear_regression_learner.train(normalized_data)
+        self.train_with_gradient_descent(feature_data, labels, normalized_feature_data, normalized_labels)
 
-        feature_data = normalized_data[:, :-1]
-        normalized_predictions = self.linear_regression_learner.predict(feature_data)
-        predictions = np.around(DataService.denormalize_predictions(data[:, -1], normalized_predictions,
+        self.test(data)
+
+        self.train_with_normal_equation(feature_data, labels, normalized_feature_data, normalized_labels)
+
+        self.test(data)
+
+    def train_with_gradient_descent(self, feature_data, labels_data, normalized_feature_data, normalized_labels):
+
+        self.linear_regression_learner.train(normalized_feature_data, normalized_labels)
+
+        normalized_predictions = self.linear_regression_learner.predict(normalized_feature_data)
+        predictions = np.around(DataService.denormalize_predictions(labels_data, normalized_predictions,
                                                                     method='min-max'))
 
         PlotService.plot_line(
@@ -36,52 +49,47 @@ class Runner:
             y_label="Training Cost",
             title="Training Learning Curve")
 
-        x, y, z = self.build_model_plot_data(data, predictions)
+        x, y, z = self.build_model_plot_data(feature_data, predictions)
         PlotService.plot3d_line(x, y, z, labels=['Age', 'Weight', 'BP'],
                                 title="Linear Model: Blood Pressure for Age and Weight." )
 
-        projected_data = data.copy()
-        projected_data[:, -1] = predictions
-        PlotService.plot3d_scatter_compare(data, projected_data, labels=['Age', 'Weight', 'BP'],
-                                title="Actual vs Projected")
+        PlotService.plot3d_scatter_compare(feature_data, labels_data, predictions, labels=['Age', 'Weight', 'BP'],
+                                           title="Actual vs Projected")
 
-        labels = normalized_data[:, -1].flatten()
-        cost = self.linear_regression_learner.calculate_cost(normalized_predictions, labels)
+        cost = self.linear_regression_learner.calculate_cost(normalized_predictions, normalized_labels)
         print("Final Normalized Cost: ", cost)
 
-        # self.test(data)
+    def train_with_normal_equation(self, feature_data, labels_data, normalized_feature_data, normalized_labels):
 
         print("Normal Equation: ")
 
         # Normal equation
-        feature_data_bias = np.insert(feature_data, 0, 1, axis=1)
+        feature_data_bias = np.insert(normalized_feature_data, 0, 1, axis=1)
         x_trans_x = np.dot(np.transpose(feature_data_bias), feature_data_bias)
-        norm_equation_theta = np.dot(np.dot(np.linalg.inv(x_trans_x), np.transpose(feature_data_bias)), labels)
+        norm_equation_theta = np.dot(np.dot(np.linalg.inv(x_trans_x), np.transpose(feature_data_bias)), normalized_labels)
         print(norm_equation_theta)
 
         self.linear_regression_learner.theta = norm_equation_theta
 
-        normalized_predictions = self.linear_regression_learner.predict(feature_data)
-        predictions = np.around(DataService.denormalize_predictions(data[:, -1], normalized_predictions,
+        normalized_predictions = self.linear_regression_learner.predict(normalized_feature_data)
+        predictions = np.around(DataService.denormalize_predictions(labels_data, normalized_predictions,
                                                                     method='min-max'))
-        cost = self.linear_regression_learner.calculate_cost(normalized_predictions, labels)
+        cost = self.linear_regression_learner.calculate_cost(normalized_predictions, normalized_labels)
         print("Final Norm Equation Normalized Cost: ", cost)
 
-        x, y, z = self.build_model_plot_data(data, predictions)
+        x, y, z = self.build_model_plot_data(feature_data, predictions)
         PlotService.plot3d_line(x, y, z, labels=['Age', 'Weight', 'BP'],
                                 title="Normal Equation Model: Blood Pressure for Age and Weight." )
 
-        projected_data = data.copy()
-        projected_data[:, -1] = predictions
-        PlotService.plot3d_scatter_compare(data, projected_data, labels=['Age', 'Weight', 'BP'],
-                                title="Normal Equation Actual vs Projected")
+        PlotService.plot3d_scatter_compare(feature_data, labels_data, predictions, labels=['Age', 'Weight', 'BP'],
+                                           title="Normal Equation Actual vs Projected")
 
 
     @staticmethod
-    def build_model_plot_data(data, predictions):
+    def build_model_plot_data(feature_data, predictions):
 
-        age = data[:, 0].flatten()
-        weight = data[:, 1].flatten()
+        age = feature_data[:, 0].flatten()
+        weight = feature_data[:, 1].flatten()
         min_predict_index = np.argmin(predictions)
         max_predict_index = np.argmax(predictions)
         x = [age[min_predict_index], age[max_predict_index]]
