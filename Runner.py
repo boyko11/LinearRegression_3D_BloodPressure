@@ -1,5 +1,5 @@
-from data_service import DataService
-from plot_service import PlotService
+from service.data_service import DataService
+from service.plot_service import PlotService
 from linear_regression_learner import LinearRegressionLearner
 import numpy as np
 

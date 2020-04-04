@@ -1,7 +1,8 @@
 import numpy as np
+from base.base_learner import BaseLearner
 
 
-class LinearRegressionLearner:
+class LinearRegressionLearner(BaseLearner):
 
     def __init__(self, data, learning_rate=0.001):
         self.theta = np.random.rand(1, data.shape[1])
@@ -21,8 +22,7 @@ class LinearRegressionLearner:
 
         return np.dot(np.insert(feature_data, 0, 1, axis=1), np.transpose(theta)).flatten()
 
-    @staticmethod
-    def calculate_cost(predictions, labels):
+    def calculate_cost(self, predictions, labels):
 
         return np.sum(np.square(labels - predictions)) / 2 * predictions.shape[0]
 
